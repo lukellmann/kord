@@ -405,7 +405,8 @@ public class Kord(
      *
      * @throws [RequestException] if anything went wrong during the request.
      */
-    public suspend fun getEntitlementOrNull(id: Snowflake): Entitlement? = defaultSupplier.getEntitlementOrNull(selfId, id)
+    public suspend fun getEntitlementOrNull(id: Snowflake): Entitlement? =
+        defaultSupplier.getEntitlementOrNull(selfId, id)
 
     /**
      * Requests to create a new [test entitlement][Entitlement] with the given [skuId], [ownerId] and [ownerType].
@@ -417,7 +418,8 @@ public class Kord(
         ownerId: Snowflake,
         ownerType: EntitlementOwnerType,
     ): Entitlement {
-        val response = rest.entitlement.createTestEntitlement(selfId, TestEntitlementCreateRequest(skuId, ownerId, ownerType))
+        val response = rest.entitlement
+            .createTestEntitlement(selfId, TestEntitlementCreateRequest(skuId, ownerId, ownerType))
         val data = EntitlementData.from(response)
 
         return Entitlement(data, this)

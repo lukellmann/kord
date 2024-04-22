@@ -278,7 +278,8 @@ private class FallbackEntitySupplier(val first: EntitySupplier, val second: Enti
         first.getAutoModerationRuleOrNull(guildId, ruleId) ?: second.getAutoModerationRuleOrNull(guildId, ruleId)
 
     override suspend fun getEntitlementOrNull(applicationId: Snowflake, entitlementId: Snowflake): Entitlement? =
-        first.getEntitlementOrNull(applicationId, entitlementId) ?: second.getEntitlementOrNull(applicationId, entitlementId)
+        first.getEntitlementOrNull(applicationId, entitlementId)
+            ?: second.getEntitlementOrNull(applicationId, entitlementId)
 
     override suspend fun getEntitlements(
         applicationId: Snowflake,

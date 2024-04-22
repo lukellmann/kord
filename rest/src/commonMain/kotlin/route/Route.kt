@@ -748,29 +748,25 @@ public sealed class Route<T>(
         Route<List<DiscordEntitlement>>(
             HttpMethod.Get,
             "/applications/$ApplicationId/entitlements",
-            ListSerializer(DiscordEntitlement.serializer())
+            ListSerializer(DiscordEntitlement.serializer()),
         )
 
     public object EntitlementGet :
         Route<DiscordEntitlement>(
             HttpMethod.Get,
             "/applications/$ApplicationId/entitlements/$EntitlementId",
-            DiscordEntitlement.serializer()
+            DiscordEntitlement.serializer(),
         )
 
     public object TestEntitlementCreate :
         Route<DiscordEntitlement>(
             HttpMethod.Post,
             "/applications/$ApplicationId/entitlements",
-            DiscordEntitlement.serializer()
+            DiscordEntitlement.serializer(),
         )
 
     public object TestEntitlementDelete :
-        Route<Unit>(
-            HttpMethod.Delete,
-            "/applications/$ApplicationId/entitlements/$EntitlementId",
-            NoStrategy
-        )
+        Route<Unit>(HttpMethod.Delete, "/applications/$ApplicationId/entitlements/$EntitlementId", NoStrategy)
 
 
     /*
@@ -782,8 +778,9 @@ public sealed class Route<T>(
         Route<List<DiscordSku>>(
             HttpMethod.Get,
             "/applications/$ApplicationId/skus",
-            ListSerializer(DiscordSku.serializer())
+            ListSerializer(DiscordSku.serializer()),
         )
+
 
     /*
      * Guild Template:

@@ -2,8 +2,8 @@
     INT_KORD_ENUM, name = "EntitlementType",
     docUrl = "https://discord.com/developers/docs/monetization/entitlements#entitlement-object-entitlement-types",
     entries = [
-        Entry("ApplicationSubscription", intValue = 8, kDoc = "Entitlement was purchased as an app subscription.")
-    ]
+        Entry("ApplicationSubscription", intValue = 8, kDoc = "Entitlement was purchased as an app subscription."),
+    ],
 )
 
 @file:Generate(
@@ -12,7 +12,7 @@
     entries = [
         Entry("Guild", intValue = 1, kDoc = "Entitlement is owned by a guild."),
         Entry("User", intValue = 2, kDoc = "Entitlement is owned by a user."),
-    ]
+    ],
 )
 
 package dev.kord.common.entity
@@ -27,7 +27,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * An instance of a [Discord Entitlement](https://discord.com/developers/docs/monetization/entitlements#entitlement-object)
+ * An instance of a
+ * [Discord Entitlement](https://discord.com/developers/docs/monetization/entitlements#entitlement-object).
  */
 @Serializable
 public data class DiscordEntitlement(

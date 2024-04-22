@@ -13,20 +13,30 @@ import kotlinx.serialization.Serializable
 @Serializable
 public data class EntitlementData(
     val id: Snowflake,
-    val applicationId: Snowflake,
-    val type: EntitlementType,
     val skuId: Snowflake,
-    val guildId: OptionalSnowflake = OptionalSnowflake.Missing,
+    val applicationId: Snowflake,
     val userId: OptionalSnowflake = OptionalSnowflake.Missing,
+    val type: EntitlementType,
     val deleted: Boolean,
-    val endsAt: Optional<Instant> = Optional.Missing(),
     val startsAt: Optional<Instant> = Optional.Missing(),
+    val endsAt: Optional<Instant> = Optional.Missing(),
+    val guildId: OptionalSnowflake = OptionalSnowflake.Missing,
 ) {
     public companion object {
         public val description: DataDescription<EntitlementData, Snowflake> = description(EntitlementData::id)
 
         public fun from(entity: DiscordEntitlement): EntitlementData = with(entity) {
-            EntitlementData(id, applicationId, type, skuId, guildId, userId, deleted, endsAt, startsAt)
+            EntitlementData(
+                id = id,
+                skuId = skuId,
+                applicationId = applicationId,
+                userId = userId,
+                type = type,
+                deleted = deleted,
+                startsAt = startsAt,
+                endsAt = endsAt,
+                guildId = guildId,
+            )
         }
     }
 }

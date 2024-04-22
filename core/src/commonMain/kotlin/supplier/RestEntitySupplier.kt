@@ -62,7 +62,6 @@ public class RestEntitySupplier(public val kord: Kord) : EntitySupplier {
     private inline val application get() = kord.rest.application
 
     // monetization
-    private inline val sku get() = kord.rest.sku
     private inline val entitlement get() = kord.rest.entitlement
 
 
@@ -648,11 +647,12 @@ public class RestEntitySupplier(public val kord: Kord) : EntitySupplier {
         GuildApplicationCommand(data, interaction)
     }
 
-    override suspend fun getEntitlementOrNull(applicationId: Snowflake, entitlementId: Snowflake): Entitlement? = catchNotFound {
-        val response = entitlement.getEntitlement(applicationId, entitlementId)
-        val data = EntitlementData.from(response)
-        Entitlement(data, kord)
-    }
+    override suspend fun getEntitlementOrNull(applicationId: Snowflake, entitlementId: Snowflake): Entitlement? =
+        catchNotFound {
+            val response = entitlement.getEntitlement(applicationId, entitlementId)
+            val data = EntitlementData.from(response)
+            Entitlement(data, kord)
+        }
 
     // maxBatchSize: see https://discord.com/developers/docs/monetization/entitlements#list-entitlements
     override suspend fun getEntitlements(

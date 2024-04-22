@@ -673,7 +673,6 @@ public interface EntitySupplier {
         userId: Snowflake? = null,
         guildId: Snowflake? = null
     ): Flow<Entitlement>
-
 }
 
 

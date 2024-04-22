@@ -22,8 +22,7 @@ public class Sku(
     override val kord: Kord,
     override val supplier: EntitySupplier = kord.defaultSupplier,
 ) : KordEntity, Strategizable {
-    override val id: Snowflake
-        get() = data.id
+    override val id: Snowflake get() = data.id
 
     /**
      * The type of this SKU.

@@ -36,7 +36,7 @@ public interface ActionInteractionBehavior : InteractionBehavior {
         kord.rest.interaction.createInteractionResponse(
             id,
             token,
-            InteractionResponseCreateRequest(InteractionResponseType.PremiumRequired)
+            InteractionResponseCreateRequest(InteractionResponseType.PremiumRequired),
         )
     }
 
@@ -124,6 +124,7 @@ public interface ActionInteractionBehavior : InteractionBehavior {
     override fun withStrategy(strategy: EntitySupplyStrategy<*>): ActionInteractionBehavior =
         ActionInteractionBehavior(id, channelId, token, applicationId, kord, strategy)
 }
+
 
 /**
  * Responds to the interaction with a public message.

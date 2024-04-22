@@ -16,10 +16,10 @@ public class EntitlementService(requestHandler: RequestHandler) : RestService(re
         keys[Route.ApplicationId] = applicationId
         request.userId?.let { parameter("user_id", it) }
         request.skuIds.joinToString(",").ifBlank { null }?.let { parameter("sku_ids", it) }
+        request.position?.let { parameter(it.key, it.value) }
         request.limit?.let { parameter("limit", it) }
         request.guildId?.let { parameter("guild_id", it) }
         request.excludeEnded?.let { parameter("exclude_ended", it) }
-        request.position?.let { parameter(it.key, it.value) }
     }
 
     public suspend fun getEntitlement(
@@ -45,5 +45,4 @@ public class EntitlementService(requestHandler: RequestHandler) : RestService(re
         keys[Route.ApplicationId] = applicationId
         keys[Route.EntitlementId] = entitlementId
     }
-
 }

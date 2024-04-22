@@ -1,7 +1,6 @@
 package dev.kord.core.exception
 
 import dev.kord.common.entity.Snowflake
-import dev.kord.core.entity.Entity
 import dev.kord.core.entity.application.ApplicationCommand
 import dev.kord.core.entity.channel.Channel
 
@@ -107,6 +106,8 @@ public class EntityNotFoundException : Exception {
             guildEntityNotFound("Auto Moderation Rule", guildId, ruleId)
 
         public inline fun entitlementNotFound(applicationId: Snowflake, entitlementId: Snowflake): Nothing =
-            throw EntityNotFoundException("Entitlement with id $entitlementId for application $applicationId was not found.")
+            throw EntityNotFoundException(
+                "Entitlement with id $entitlementId for application $applicationId was not found."
+            )
     }
 }
