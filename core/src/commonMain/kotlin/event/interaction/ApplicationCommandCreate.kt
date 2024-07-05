@@ -8,7 +8,7 @@ import dev.kord.core.event.Event
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public sealed interface ApplicationCommandCreateEvent : Event {
     public val command: GuildApplicationCommand
@@ -18,7 +18,7 @@ public sealed interface ApplicationCommandCreateEvent : Event {
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public class ChatInputCommandCreateEvent(
     override val command: GuildChatInputCommand,
@@ -32,7 +32,7 @@ public class ChatInputCommandCreateEvent(
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public class UserCommandCreateEvent(
     override val command: GuildUserCommand,
@@ -46,7 +46,7 @@ public class UserCommandCreateEvent(
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public class MessageCommandCreateEvent(
     override val command: GuildMessageCommand,
@@ -60,7 +60,7 @@ public class MessageCommandCreateEvent(
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public class UnknownApplicationCommandCreateEvent(
     override val command: UnknownGuildApplicationCommand,

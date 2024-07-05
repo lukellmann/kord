@@ -114,6 +114,6 @@ public val Permissions.Companion.ALL: Permissions get() = ALL_PERMISSIONS
 @Deprecated(
     "'Permissions.NewCompanion' was renamed to 'Permissions.Companion'. Use 'Permissions.Companion.ALL' instead.",
     ReplaceWith("Permissions.ALL", imports = ["dev.kord.common.entity.Permissions", "dev.kord.common.entity.ALL"]),
-    DeprecationLevel.ERROR,
+    DeprecationLevel.HIDDEN,
 )
 public val Permissions.NewCompanion.ALL: Permissions get() = ALL_PERMISSIONS

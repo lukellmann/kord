@@ -8,7 +8,7 @@ import dev.kord.core.event.Event
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public sealed interface ApplicationCommandUpdateEvent : Event {
     public val command: GuildApplicationCommand
@@ -18,7 +18,7 @@ public sealed interface ApplicationCommandUpdateEvent : Event {
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public class ChatInputCommandUpdateEvent(
     override val command: GuildChatInputCommand,
@@ -32,7 +32,7 @@ public class ChatInputCommandUpdateEvent(
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public class UserCommandUpdateEvent(
     override val command: GuildUserCommand,
@@ -46,7 +46,7 @@ public class UserCommandUpdateEvent(
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public class MessageCommandUpdateEvent(
     override val command: GuildMessageCommand,
@@ -59,7 +59,7 @@ public class MessageCommandUpdateEvent(
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public class UnknownApplicationCommandUpdateEvent(
     override val command: UnknownGuildApplicationCommand,

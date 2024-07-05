@@ -300,7 +300,7 @@ public data class Heartbeat(val data: Long) : Event() {
         @Deprecated(
             "Renamed to 'Companion'.",
             ReplaceWith("Heartbeat.Companion", imports = ["dev.kord.gateway.Heartbeat"]),
-            DeprecationLevel.ERROR,
+            DeprecationLevel.HIDDEN,
         )
         @JvmField
         public val NewCompanion: NewCompanion = NewCompanion()
@@ -309,7 +309,7 @@ public data class Heartbeat(val data: Long) : Event() {
     @Deprecated(
         "Renamed to 'Companion'.",
         ReplaceWith("Heartbeat.Companion", imports = ["dev.kord.gateway.Heartbeat"]),
-        DeprecationLevel.ERROR,
+        DeprecationLevel.HIDDEN,
     )
     public class NewCompanion internal constructor() {
         public fun serializer(): KSerializer<Heartbeat> = Heartbeat.serializer()
@@ -507,7 +507,7 @@ public data class InteractionCreate(val interaction: DiscordInteraction, overrid
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public data class ApplicationCommandCreate(val application: DiscordApplicationCommand, override val sequence: Int?) :
     DispatchEvent()
@@ -516,7 +516,7 @@ public data class ApplicationCommandCreate(val application: DiscordApplicationCo
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public data class ApplicationCommandUpdate(val application: DiscordApplicationCommand, override val sequence: Int?) :
     DispatchEvent()
@@ -525,7 +525,7 @@ public data class ApplicationCommandUpdate(val application: DiscordApplicationCo
 @Deprecated(
     "This event is not supposed to be sent to bots. See https://github.com/discord/discord-api-docs/issues/3690 for " +
         "details.",
-    level = DeprecationLevel.ERROR,
+    level = DeprecationLevel.HIDDEN,
 )
 public data class ApplicationCommandDelete(val application: DiscordApplicationCommand, override val sequence: Int?) :
     DispatchEvent()
