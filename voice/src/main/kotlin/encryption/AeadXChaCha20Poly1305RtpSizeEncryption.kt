@@ -1,0 +1,3 @@
+package dev.kord.voice.encryption
+
+internal class AeadXChaCha20Poly1305RtpSizeEncryption

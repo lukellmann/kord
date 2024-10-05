@@ -1,22 +1,101 @@
 package dev.kord.voice.udp
 
-import com.iwebpp.crypto.TweetNaclFast
-import dev.kord.voice.encryption.XSalsa20Poly1305Codec
-import dev.kord.voice.encryption.strategies.NonceStrategy
+import com.iwebpp.crypto.*
+import dev.kord.voice.EncryptionMode
+import dev.kord.voice.EncryptionMode.*
+import dev.kord.voice.encryption.*
+import dev.kord.voice.encryption.strategies.*
 import dev.kord.voice.io.ByteArrayView
 import dev.kord.voice.io.MutableByteArrayCursor
 import dev.kord.voice.io.mutableCursor
 import dev.kord.voice.io.view
 
-public abstract class AudioPacketProvider(public val key: ByteArray, public val nonceStrategy: NonceStrategy) {
+public abstract class AudioPacketProvider private constructor(public val key: ByteArray, internal val mode: Mode) {
+
+    internal sealed interface Mode {
+        class Legacy(val nonceStrategy: @Suppress("DEPRECATION") NonceStrategy) : Mode
+        class New(val encryptionMode: EncryptionMode) : Mode
+    }
+
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated(
+        "XSalsa20 Poly1305 encryption is deprecated for Discord voice connections and will be discontinued as of " +
+            "November 18th, 2024. As of this date, the voice gateway will not allow you to connect with one of the " +
+            "deprecated encryption modes. The deprecation level will be raised to ERROR in 0.16.0, to HIDDEN in " +
+            "0.17.0, and this property will be removed in 0.18.0.",
+        level = DeprecationLevel.WARNING,
+    )
+    public val nonceStrategy: @Suppress("DEPRECATION") NonceStrategy
+        get() = when (mode) {
+            is Mode.Legacy -> mode.nonceStrategy
+            is Mode.New ->
+                throw UnsupportedOperationException("This AudioPacketProvider was created without a nonceStrategy.")
+        }
+
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "XSalsa20 Poly1305 encryption is deprecated for Discord voice connections and will be discontinued as of " +
+            "November 18th, 2024. As of this date, the voice gateway will not allow you to connect with one of the " +
+            "deprecated encryption modes. The deprecation level will be raised to ERROR in 0.16.0, to HIDDEN in " +
+            "0.17.0, and this constructor will be removed in 0.18.0.",
+        level = DeprecationLevel.WARNING,
+    )
+    public constructor(key: ByteArray, nonceStrategy: NonceStrategy) : this(key, Mode.Legacy(nonceStrategy))
+
+    public constructor(key: ByteArray, encryptionMode: EncryptionMode) : this(key, Mode.New(encryptionMode))
+
     public abstract fun provide(sequence: UShort, timestamp: UInt, ssrc: UInt, data: ByteArray): ByteArrayView
 }
 
 private class CouldNotEncryptDataException(data: ByteArray) :
     RuntimeException("Couldn't encrypt the following data: [${data.joinToString(", ")}]")
 
-public class DefaultAudioPacketProvider(key: ByteArray, nonceStrategy: NonceStrategy) :
-    AudioPacketProvider(key, nonceStrategy) {
+public class DefaultAudioPacketProvider : AudioPacketProvider {
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "XSalsa20 Poly1305 encryption is deprecated for Discord voice connections and will be discontinued as of " +
+            "November 18th, 2024. As of this date, the voice gateway will not allow you to connect with one of the " +
+            "deprecated encryption modes. The deprecation level will be raised to ERROR in 0.16.0, to HIDDEN in " +
+            "0.17.0, and this constructor will be removed in 0.18.0.",
+        level = DeprecationLevel.WARNING,
+    )
+    public constructor(key: ByteArray, nonceStrategy: NonceStrategy) : super(key, nonceStrategy)
+
+    public constructor(key: ByteArray, encryptionMode: EncryptionMode) : super(key, encryptionMode)
+
+    private val delegate = when (mode) {
+        is Mode.Legacy -> LegacyProviderDelegate(key, mode.nonceStrategy)
+        is Mode.New -> @Suppress("DEPRECATION") when (mode.encryptionMode) {
+            AeadAes256GcmRtpSize -> EncryptedPacketCreatorProviderDelegate(AeadAes256GcmVoicePacketCreator(key))
+            AeadXChaCha20Poly1305RtpSize -> TODO()
+            XSalsa20Poly1305 -> LegacyProviderDelegate(key, NormalNonceStrategy())
+            XSalsa20Poly1305Lite -> LegacyProviderDelegate(key, LiteNonceStrategy())
+            XSalsa20Poly1305Suffix -> LegacyProviderDelegate(key, SuffixNonceStrategy())
+            is Unknown -> throw UnsupportedOperationException("Unknown encryption mode $mode")
+        }
+    }
+
+    override fun provide(sequence: UShort, timestamp: UInt, ssrc: UInt, data: ByteArray): ByteArrayView =
+        delegate.provide(sequence, timestamp, ssrc, data)
+}
+
+private interface ProviderDelegate {
+    fun provide(sequence: UShort, timestamp: UInt, ssrc: UInt, data: ByteArray): ByteArrayView
+}
+
+private class EncryptedPacketCreatorProviderDelegate(
+    private val packetCreator: EncryptedVoicePacketCreator,
+) : ProviderDelegate {
+    private val lock = Any() // TODO do we need this lock?
+    override fun provide(sequence: UShort, timestamp: UInt, ssrc: UInt, data: ByteArray): ByteArrayView =
+        synchronized(lock) {
+            packetCreator.createEncryptedVoicePacket(sequence, timestamp, ssrc, audioPlaintext = data).view()
+        }
+}
+
+@Suppress("DEPRECATION")
+private class LegacyProviderDelegate(key: ByteArray, private val nonceStrategy: NonceStrategy) : ProviderDelegate {
+
     private val codec = XSalsa20Poly1305Codec(key)
 
     private val packetBuffer = ByteArray(2048)

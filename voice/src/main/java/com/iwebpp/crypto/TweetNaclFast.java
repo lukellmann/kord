@@ -13,6 +13,21 @@ import java.util.concurrent.atomic.AtomicLong;
  * @description 
  *   TweetNacl.c Java porting
  * */
+/**
+ * @deprecated XSalsa20 Poly1305 encryption is deprecated for Discord voice connections and will be discontinued as of
+ * November 18th, 2024. As of this date, the voice gateway will not allow you to connect with one of the deprecated
+ * encryption modes. If you need an implementation of TweetNaCl, provide your own instead. This class will be removed
+ * in 0.18.0.
+ */
+@Deprecated
+@kotlin.Deprecated(
+		message = "XSalsa20 Poly1305 encryption is deprecated for Discord voice connections and will be discontinued " +
+				"as of November 18th, 2024. As of this date, the voice gateway will not allow you to connect with " +
+				"one of the deprecated encryption modes. If you need an implementation of TweetNaCl, provide your " +
+				"own instead. The deprecation level will be raised to ERROR in 0.16.0, to HIDDEN in 0.17.0, and this " +
+				"class will be removed in 0.18.0.",
+		level = kotlin.DeprecationLevel.WARNING
+)
 public final class TweetNaclFast {
 
 	private final static String TAG = "TweetNaclFast";

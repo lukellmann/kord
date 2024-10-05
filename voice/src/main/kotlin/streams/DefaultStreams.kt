@@ -1,11 +1,11 @@
 package dev.kord.voice.streams
 
-import com.iwebpp.crypto.TweetNaclFast
+import com.iwebpp.crypto.*
 import dev.kord.common.annotation.KordVoice
 import dev.kord.common.entity.Snowflake
 import dev.kord.voice.AudioFrame
-import dev.kord.voice.encryption.XSalsa20Poly1305Codec
-import dev.kord.voice.encryption.strategies.NonceStrategy
+import dev.kord.voice.encryption.*
+import dev.kord.voice.encryption.strategies.*
 import dev.kord.voice.gateway.Speaking
 import dev.kord.voice.gateway.VoiceGateway
 import dev.kord.voice.io.*
@@ -25,11 +25,35 @@ import kotlinx.coroutines.flow.*
 private val defaultStreamsLogger = KotlinLogging.logger { }
 
 @KordVoice
-public class DefaultStreams(
-    private val voiceGateway: VoiceGateway,
-    private val udp: VoiceUdpSocket,
-    private val nonceStrategy: NonceStrategy
-) : Streams {
+public class DefaultStreams : Streams {
+
+    private val voiceGateway: VoiceGateway
+    private val udp: VoiceUdpSocket
+
+    private val nonceStrategy: @Suppress("DEPRECATION") NonceStrategy?
+
+    public constructor(voiceGateway: VoiceGateway, udp: VoiceUdpSocket) {
+        this.voiceGateway = voiceGateway
+        this.udp = udp
+        this.nonceStrategy = null
+    }
+
+    @Deprecated(
+        "XSalsa20 Poly1305 encryption is deprecated for Discord voice connections and will be discontinued as of " +
+            "November 18th, 2024. As of this date, the voice gateway will not allow you to connect with one of the " +
+            "deprecated encryption modes. The deprecation level will be raised to ERROR in 0.16.0, to HIDDEN in " +
+            "0.17.0, and this constructor will be removed in 0.18.0.",
+        ReplaceWith("DefaultStreams(voiceGateway, udp)", imports = ["dev.kord.voice.streams.DefaultStreams"]),
+        level = DeprecationLevel.WARNING,
+    )
+    public constructor(
+        voiceGateway: VoiceGateway, udp: VoiceUdpSocket, nonceStrategy: @Suppress("DEPRECATION") NonceStrategy,
+    ) {
+        this.voiceGateway = voiceGateway
+        this.udp = udp
+        this.nonceStrategy = nonceStrategy
+    }
+
     private fun CoroutineScope.listenForIncoming(key: ByteArray, server: SocketAddress) {
         udp.incoming
             .filter { it.address == server }
@@ -86,8 +110,12 @@ public class DefaultStreams(
     override val ssrcToUser: Map<UInt, Snowflake> get() = _ssrcToUser.value
 }
 
-private fun Flow<RTPPacket>.decrypt(nonceStrategy: NonceStrategy, key: ByteArray): Flow<RTPPacket> {
-    val codec = XSalsa20Poly1305Codec(key)
+private fun Flow<RTPPacket>.decrypt(
+    nonceStrategy: @Suppress("DEPRECATION") NonceStrategy?, key: ByteArray,
+): Flow<RTPPacket> {
+    val codec = @Suppress("DEPRECATION") XSalsa20Poly1305Codec(key)
+
+    @Suppress("DEPRECATION")
     val nonceBuffer = ByteArray(TweetNaclFast.SecretBox.nonceLength).mutableCursor()
 
     val decryptedBuffer = ByteArray(512)
@@ -98,7 +126,9 @@ private fun Flow<RTPPacket>.decrypt(nonceStrategy: NonceStrategy, key: ByteArray
         nonceBuffer.reset()
         decryptedCursor.reset()
 
-        nonceBuffer.writeByteView(nonceStrategy.strip(it))
+        if (nonceStrategy != null) {
+            nonceBuffer.writeByteView(nonceStrategy.strip(it))
+        }
 
         val decrypted = with(it.payload) {
             codec.decrypt(data, dataStart, viewSize, nonceBuffer.data, decryptedCursor)
