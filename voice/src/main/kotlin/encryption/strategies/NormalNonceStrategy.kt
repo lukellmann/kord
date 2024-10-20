@@ -1,5 +1,7 @@
 package dev.kord.voice.encryption.strategies
 
+import dev.kord.voice.XSalsa20_CLASS_DEPRECATION_CYCLE
+import dev.kord.voice.XSalsa20_DEPRECATION
 import dev.kord.voice.io.ByteArrayView
 import dev.kord.voice.io.MutableByteArrayCursor
 import dev.kord.voice.io.mutableCursor
@@ -7,7 +9,11 @@ import dev.kord.voice.io.view
 import dev.kord.voice.udp.RTPPacket
 import dev.kord.voice.udp.RTP_HEADER_LENGTH
 
-public class NormalNonceStrategy : NonceStrategy {
+@Deprecated(
+    "$XSalsa20_DEPRECATION 'NormalNonceStrategy' is no longer needed. $XSalsa20_CLASS_DEPRECATION_CYCLE",
+    level = DeprecationLevel.WARNING,
+)
+public class NormalNonceStrategy : @Suppress("DEPRECATION") NonceStrategy {
     // the nonce is already a part of the rtp header, which means this will take up no extra space.
     override val nonceLength: Int = 0
 

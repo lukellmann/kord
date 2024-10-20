@@ -12,6 +12,8 @@ dependencies {
     implementation(libs.kotlin.logging)
     implementation(libs.slf4j.api)
 
+    implementation(libs.tink)
+
     // TODO remove when voiceGatewayOnLogger is removed
     implementation(libs.kotlin.logging.old)
 

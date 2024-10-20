@@ -1,5 +1,7 @@
 package dev.kord.voice.encryption.strategies
 
+import dev.kord.voice.XSalsa20_CLASS_DEPRECATION_CYCLE
+import dev.kord.voice.XSalsa20_DEPRECATION
 import dev.kord.voice.io.ByteArrayView
 import dev.kord.voice.io.MutableByteArrayCursor
 import dev.kord.voice.io.mutableCursor
@@ -7,7 +9,11 @@ import dev.kord.voice.io.view
 import dev.kord.voice.udp.RTPPacket
 import kotlinx.atomicfu.atomic
 
-public class LiteNonceStrategy : NonceStrategy {
+@Deprecated(
+    "$XSalsa20_DEPRECATION 'LiteNonceStrategy' is no longer needed. $XSalsa20_CLASS_DEPRECATION_CYCLE",
+    level = DeprecationLevel.WARNING,
+)
+public class LiteNonceStrategy : @Suppress("DEPRECATION") NonceStrategy {
     override val nonceLength: Int = 4
 
     private var count: Int by atomic(0)

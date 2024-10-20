@@ -4,7 +4,7 @@ import dev.kord.common.annotation.KordVoice
 import dev.kord.common.entity.Snowflake
 import dev.kord.gateway.Gateway
 import dev.kord.gateway.UpdateVoiceStatus
-import dev.kord.voice.encryption.strategies.NonceStrategy
+import dev.kord.voice.encryption.strategies.*
 import dev.kord.voice.gateway.VoiceGateway
 import dev.kord.voice.gateway.VoiceGatewayConfiguration
 import dev.kord.voice.handlers.StreamsHandler
@@ -41,10 +41,9 @@ public data class VoiceConnectionData(
  * @param audioProvider a [AudioProvider] that will provide [AudioFrame] when required.
  * @param frameInterceptor a [FrameInterceptor] that will intercept all outgoing [AudioFrame]s.
  * @param frameSender the [AudioFrameSender] that will handle the sending of audio packets.
- * @param nonceStrategy the [NonceStrategy] that is used during encryption of audio.
  */
 @KordVoice
-public class VoiceConnection(
+public class VoiceConnection private constructor(
     public val data: VoiceConnectionData,
     public val gateway: Gateway,
     public val voiceGateway: VoiceGateway,
@@ -54,9 +53,52 @@ public class VoiceConnection(
     public val audioProvider: AudioProvider,
     public val frameInterceptor: FrameInterceptor,
     public val frameSender: AudioFrameSender,
-    public val nonceStrategy: NonceStrategy,
-    connectionDetachDuration: Duration
+    connectionDetachDuration: Duration,
+    internal val strategy: @Suppress("DEPRECATION") NonceStrategy?,
 ) {
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated(
+        "$XSalsa20_DEPRECATION A 'VoiceConnection' instance can be created without a 'nonceStrategy' in which case " +
+            "this property will throw an 'UnsupportedOperationException'. $XSalsa20_PROPERTY_DEPRECATION_CYCLE",
+        level = DeprecationLevel.WARNING,
+    )
+    public val nonceStrategy: @Suppress("DEPRECATION") NonceStrategy
+        get() = strategy
+            ?: throw UnsupportedOperationException("This VoiceConnection instance was created without a nonceStrategy.")
+
+    @Deprecated(
+        "$XSalsa20_DEPRECATION Construct a 'VoiceConnection' instance without a 'nonceStrategy' instead. " +
+            XSalsa20_CONSTRUCTOR_DEPRECATION_CYCLE,
+        ReplaceWith(
+            "VoiceConnection(data, gateway, voiceGateway, socket, voiceGatewayConfiguration, streams, audioProvider, " +
+                "frameInterceptor, frameSender, connectionDetachDuration)",
+            imports = ["dev.kord.voice.VoiceConnection"]
+        ),
+        DeprecationLevel.WARNING,
+    )
+    public constructor(
+        data: VoiceConnectionData, gateway: Gateway, voiceGateway: VoiceGateway, socket: VoiceUdpSocket,
+        voiceGatewayConfiguration: VoiceGatewayConfiguration, streams: Streams, audioProvider: AudioProvider,
+        frameInterceptor: FrameInterceptor, frameSender: AudioFrameSender,
+        nonceStrategy: @Suppress("DEPRECATION") NonceStrategy, connectionDetachDuration: Duration,
+    ) : this(
+        data = data, gateway = gateway, voiceGateway = voiceGateway, socket = socket,
+        voiceGatewayConfiguration = voiceGatewayConfiguration, streams = streams, audioProvider = audioProvider,
+        frameInterceptor = frameInterceptor, frameSender = frameSender,
+        connectionDetachDuration = connectionDetachDuration, strategy = nonceStrategy,
+    )
+
+    public constructor(
+        data: VoiceConnectionData, gateway: Gateway, voiceGateway: VoiceGateway, socket: VoiceUdpSocket,
+        voiceGatewayConfiguration: VoiceGatewayConfiguration, streams: Streams, audioProvider: AudioProvider,
+        frameInterceptor: FrameInterceptor, frameSender: AudioFrameSender, connectionDetachDuration: Duration,
+    ) : this(
+        data = data, gateway = gateway, voiceGateway = voiceGateway, socket = socket,
+        voiceGatewayConfiguration = voiceGatewayConfiguration, streams = streams, audioProvider = audioProvider,
+        frameInterceptor = frameInterceptor, frameSender = frameSender,
+        connectionDetachDuration = connectionDetachDuration, strategy = null,
+    )
+
     public val scope: CoroutineScope =
         CoroutineScope(SupervisorJob() + CoroutineName("kord-voice-connection[${data.guildId.value}]"))
 
@@ -153,3 +195,19 @@ public suspend inline fun VoiceConnection(
     contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
     return VoiceConnectionBuilder(gateway, selfId, channelId, guildId).apply(builder).build()
 }
+
+
+internal const val XSalsa20_DEPRECATION = "XSalsa20 Poly1305 encryption is deprecated for Discord voice connections " +
+    "and will be discontinued as of November 18th, 2024. As of this date, the voice gateway will not allow you to " +
+    "connect with one of the deprecated encryption modes."
+
+private const val DEPRECATION_CYCLE_1 =
+    "The deprecation level will be raised to ERROR in 0.17.0, to HIDDEN in 0.18.0, and this"
+private const val DEPRECATION_CYCLE_2 = "will be removed in 0.19.0."
+
+internal const val XSalsa20_CLASS_DEPRECATION_CYCLE = "$DEPRECATION_CYCLE_1 class $DEPRECATION_CYCLE_2"
+internal const val XSalsa20_INTERFACE_DEPRECATION_CYCLE = "$DEPRECATION_CYCLE_1 interface $DEPRECATION_CYCLE_2"
+internal const val XSalsa20_OBJECT_DEPRECATION_CYCLE = "$DEPRECATION_CYCLE_1 object $DEPRECATION_CYCLE_2"
+internal const val XSalsa20_CONSTRUCTOR_DEPRECATION_CYCLE = "$DEPRECATION_CYCLE_1 constructor $DEPRECATION_CYCLE_2"
+internal const val XSalsa20_PROPERTY_DEPRECATION_CYCLE = "$DEPRECATION_CYCLE_1 property $DEPRECATION_CYCLE_2"
+internal const val XSalsa20_FUNCTION_DEPRECATION_CYCLE = "$DEPRECATION_CYCLE_1 function $DEPRECATION_CYCLE_2"

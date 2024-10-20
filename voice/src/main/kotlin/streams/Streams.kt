@@ -3,6 +3,10 @@ package dev.kord.voice.streams
 import dev.kord.common.annotation.KordVoice
 import dev.kord.common.entity.Snowflake
 import dev.kord.voice.AudioFrame
+import dev.kord.voice.EncryptionMode
+import dev.kord.voice.XSalsa20_DEPRECATION
+import dev.kord.voice.XSalsa20_FUNCTION_DEPRECATION_CYCLE
+import dev.kord.voice.udp.DecryptedVoicePacket
 import dev.kord.voice.udp.RTPPacket
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.flow.Flow
@@ -15,12 +19,31 @@ public interface Streams {
     /**
      * Starts propagating packets from [server] with the following [key] to decrypt the incoming frames.
      */
+    @Deprecated(
+        "$XSalsa20_DEPRECATION Pass an explicit 'EncryptionMode' instead. $XSalsa20_FUNCTION_DEPRECATION_CYCLE",
+        ReplaceWith(
+            "this.listen(key, server, EncryptionMode.AeadXChaCha20Poly1305RtpSize)",
+            imports = ["dev.kord.voice.EncryptionMode"],
+        ),
+        DeprecationLevel.WARNING,
+    )
     public suspend fun listen(key: ByteArray, server: SocketAddress)
+
+    /**
+     * Starts propagating packets from [server] with the following [key] to decrypt the incoming frames according to
+     * [encryptionMode].
+     */
+    public suspend fun listen(key: ByteArray, server: SocketAddress, encryptionMode: EncryptionMode)
 
     /**
      * A flow of all incoming [dev.kord.voice.udp.RTPPacket]s through the UDP connection.
      */
     public val incomingAudioPackets: Flow<RTPPacket>
+
+    /**
+     * A flow of all incoming [DecryptedVoicePacket]s through the UDP connection.
+     */
+    public val incomingVoicePackets: Flow<DecryptedVoicePacket>
 
     /**
      * A flow of all incoming [AudioFrame]s mapped to their [ssrc][UInt].

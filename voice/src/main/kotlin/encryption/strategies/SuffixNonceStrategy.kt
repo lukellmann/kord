@@ -1,5 +1,7 @@
 package dev.kord.voice.encryption.strategies
 
+import dev.kord.voice.XSalsa20_CLASS_DEPRECATION_CYCLE
+import dev.kord.voice.XSalsa20_DEPRECATION
 import dev.kord.voice.io.ByteArrayView
 import dev.kord.voice.io.MutableByteArrayCursor
 import dev.kord.voice.io.view
@@ -8,7 +10,11 @@ import kotlin.random.Random
 
 private const val SUFFIX_NONCE_LENGTH = 24
 
-public class SuffixNonceStrategy : NonceStrategy {
+@Deprecated(
+    "$XSalsa20_DEPRECATION 'SuffixNonceStrategy' is no longer needed. $XSalsa20_CLASS_DEPRECATION_CYCLE",
+    level = DeprecationLevel.WARNING,
+)
+public class SuffixNonceStrategy : @Suppress("DEPRECATION") NonceStrategy {
     override val nonceLength: Int = SUFFIX_NONCE_LENGTH
 
     private val nonceBuffer: ByteArray = ByteArray(SUFFIX_NONCE_LENGTH)

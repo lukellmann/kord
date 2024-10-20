@@ -7,8 +7,7 @@ import dev.kord.gateway.Gateway
 import dev.kord.gateway.UpdateVoiceStatus
 import dev.kord.gateway.VoiceServerUpdate
 import dev.kord.gateway.VoiceStateUpdate
-import dev.kord.voice.encryption.strategies.LiteNonceStrategy
-import dev.kord.voice.encryption.strategies.NonceStrategy
+import dev.kord.voice.encryption.strategies.*
 import dev.kord.voice.exception.VoiceConnectionInitializationException
 import dev.kord.voice.gateway.DefaultVoiceGatewayBuilder
 import dev.kord.voice.gateway.VoiceGateway
@@ -65,9 +64,13 @@ public class VoiceConnectionBuilder(
 
     /**
      * The nonce strategy to be used for the encryption of audio packets.
-     * If `null`, [dev.kord.voice.encryption.strategies.LiteNonceStrategy] will be used.
      */
-    public var nonceStrategy: NonceStrategy? = null
+    @Deprecated(
+        "$XSalsa20_DEPRECATION Do not explicitly specify a 'nonceStrategy', the 'VoiceConnection' automatically " +
+            "selects a suitable encryption mode. $XSalsa20_PROPERTY_DEPRECATION_CYCLE",
+        level = DeprecationLevel.WARNING,
+    )
+    public var nonceStrategy: @Suppress("DEPRECATION") NonceStrategy? = null
 
     /**
      * A boolean indicating whether your voice state will be muted.
@@ -166,33 +169,57 @@ public class VoiceConnectionBuilder(
             .build()
         val udpSocket = udpSocket ?: GlobalVoiceUdpSocket
         val audioProvider = audioProvider ?: EmptyAudioPlayerProvider
-        val nonceStrategy = nonceStrategy ?: LiteNonceStrategy()
+        val nonceStrategy = @Suppress("DEPRECATION") nonceStrategy
         val frameInterceptor = frameInterceptor ?: DefaultFrameInterceptor()
         val audioSender =
             audioSender ?: DefaultAudioFrameSender(
-                DefaultAudioFrameSenderData(
-                    udpSocket,
-                    frameInterceptor,
-                    audioProvider,
-                    nonceStrategy
-                )
+                if (nonceStrategy != null) {
+                    @Suppress("DEPRECATION")
+                    DefaultAudioFrameSenderData(udpSocket, frameInterceptor, audioProvider, nonceStrategy)
+                } else {
+                    DefaultAudioFrameSenderData(udpSocket, frameInterceptor, audioProvider)
+                }
             )
-        val streams =
-            streams ?: if (receiveVoice) DefaultStreams(voiceGateway, udpSocket, nonceStrategy) else NOPStreams
 
-        return VoiceConnection(
-            voiceConnectionData,
-            gateway,
-            voiceGateway,
-            udpSocket,
-            initialGatewayConfiguration,
-            streams,
-            audioProvider,
-            frameInterceptor,
-            audioSender,
-            nonceStrategy,
-            connectionDetachDuration
-        )
+        val streams =
+            streams ?: run {
+                val receive = receiveVoice
+                when {
+                    receive && nonceStrategy != null ->
+                        @Suppress("DEPRECATION") DefaultStreams(voiceGateway, udpSocket, nonceStrategy)
+                    receive -> DefaultStreams(voiceGateway, udpSocket)
+                    else -> NOPStreams
+                }
+            }
+
+        return if (nonceStrategy != null) {
+            @Suppress("DEPRECATION") VoiceConnection(
+                voiceConnectionData,
+                gateway,
+                voiceGateway,
+                udpSocket,
+                initialGatewayConfiguration,
+                streams,
+                audioProvider,
+                frameInterceptor,
+                audioSender,
+                nonceStrategy,
+                connectionDetachDuration
+            )
+        } else {
+            VoiceConnection(
+                voiceConnectionData,
+                gateway,
+                voiceGateway,
+                udpSocket,
+                initialGatewayConfiguration,
+                streams,
+                audioProvider,
+                frameInterceptor,
+                audioSender,
+                connectionDetachDuration,
+            )
+        }
     }
 
     // we can't use the SAM feature or else we break the IR backend, so lets just use this object instead
